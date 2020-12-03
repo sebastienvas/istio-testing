@@ -450,7 +450,7 @@ postsubmits:
         - prow/integ-suite-kind.sh
         - --topology
         - MULTICLUSTER
-        - test.integration.multicluster.kube.presubmit
+        - test.integration.externalistiod.multicluster
         - --topology-config
         - ${ROOT}/prow/config/topology/externalistiod.json
         env:
@@ -1860,7 +1860,7 @@ presubmits:
         - prow/integ-suite-kind.sh
         - --topology
         - MULTICLUSTER
-        - test.integration.multicluster.kube.presubmit
+        - test.integration.externalistiod.multicluster
         - --topology-config
         - ${ROOT}/prow/config/topology/externalistiod.json
         env:
