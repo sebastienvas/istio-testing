@@ -129,4 +129,5 @@ _go_image_repos()
 
 load("@//:repos.bzl", "go_repositories")
 
+# gazelle:repository_macro repos.bzl%go_repositories
 go_repositories()

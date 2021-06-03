@@ -20,7 +20,7 @@ export KUBECONFIG
 KUBECONFIG=$(mktemp -t kubeconfig-XXXXXXXXXX)
 
 name="authentikos"
-image="${IMAGE:-kindest/node:v1.17.0}"
+image="${IMAGE:-kindest/node:v1.17.11}"
 verbosity="${VERBOSITY:-9}"
 
 cleanup_cluster() {
@@ -29,6 +29,7 @@ cleanup_cluster() {
 
 setup_cluster() {
   kind create cluster --name="$name" --image="$image" --verbosity="$verbosity" --wait=60s
+  kind load docker-image gcr.io/istio-testing/authentikos:latest --name="$name"
 }
 
 with_timeout() {

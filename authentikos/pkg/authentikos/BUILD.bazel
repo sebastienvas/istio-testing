@@ -1,0 +1,27 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["authentikos.go"],
+    importpath = "istio.io/test-infra/authentikos/pkg/authentikos",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_mattbaird_jsonpatch//:go_default_library",
+        "@io_k8s_api//core/v1:go_default_library",
+        "@io_k8s_apimachinery//pkg/types:go_default_library",
+        "@io_k8s_client_go//kubernetes/typed/core/v1:go_default_library",
+        "@io_k8s_klog//:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["authentikos_test.go"],
+    embed = [":go_default_library"],
+    deps = [
+        "@com_github_google_go_cmp//cmp:go_default_library",
+        "@io_k8s_api//core/v1:go_default_library",
+        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
+        "@io_k8s_client_go//kubernetes/fake:go_default_library",
+    ],
+)

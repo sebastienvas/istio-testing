@@ -33,7 +33,7 @@ unit-test:
 	@go test ./...
 
 .PHONY: integ-test
-integ-test:
+integ-test: image
 	@bash ./test/integ-simple.sh
 
 .PHONY: test

@@ -33,31 +33,31 @@ get_tokeninfo() {
 }
 
 run_test() {
-  set -x
+  set -xe
 
   local tokeninfo="$1"
 
   echo "Test 'error' is null"
-  echo "$tokeninfo" | jq -r '.error' | xargs -r -I% test % = "null"
+  [[ $(echo "$tokeninfo" | jq -r '.error') == 'null' ]] || exit 1
 
   echo "Test 'issued_to' exists"
-  echo "$tokeninfo" | jq -r '.issued_to' | xargs -r test -n
+  [[ $(echo "$tokeninfo" | jq -r '.issued_to') != "null" ]] || exit 1
 
   echo "Test 'audience' exists"
-  echo "$tokeninfo" | jq -r '.audience' | xargs -r test -n
+  [[ $(echo "$tokeninfo" | jq -r '.audience') != "null" ]] || exit 1
 
   echo "Test 'user_id' exists"
-  echo "$tokeninfo" | jq -r '.user_id' | xargs -r test -n
+  [[ $(echo "$tokeninfo" | jq -r '.user_id') != "null" ]] || exit 1
 
   echo "Test 'email' exists"
-  echo "$tokeninfo" | jq -r '.email' | xargs -r test -n
+  [[ $(echo "$tokeninfo" | jq -r '.email') != "null" ]] || exit 1
 
   echo "Test 'expires_in' greater than 0"
-  echo "$tokeninfo" | jq -r '.expires_in' | xargs -r -I% test % -lt 0
+  [[ $(echo "$tokeninfo" | jq -r '.expires_in') -gt 0 ]] || exit 1
 
   echo "Test 'scope' includes 'userinfo.email', 'cloud-platform', and 'openid'"
   echo "$tokeninfo" | jq -r '.scope' |
-    grep -w "openi" |
+    grep -w "openid" |
     grep -w "https://www.googleapis.com/auth/cloud-platform" |
     grep -w "https://www.googleapis.com/auth/userinfo.email" >/dev/null
 }

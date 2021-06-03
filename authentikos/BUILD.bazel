@@ -6,16 +6,14 @@ go_library(
     importpath = "istio.io/test-infra/authentikos",
     visibility = ["//visibility:private"],
     deps = [
-        "@com_github_spf13_pflag//:go_default_library",
-        "@io_k8s_api//core/v1:go_default_library",
+        "//authentikos/pkg/authentikos:go_default_library",
+        "//authentikos/pkg/plugins/google:go_default_library",
         "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
         "@io_k8s_client_go//kubernetes:go_default_library",
-        "@io_k8s_client_go//kubernetes/typed/core/v1:go_default_library",
         "@io_k8s_client_go//plugin/pkg/client/auth:go_default_library",
         "@io_k8s_client_go//rest:go_default_library",
         "@io_k8s_client_go//tools/clientcmd:go_default_library",
-        "@org_golang_google_api//option:go_default_library",
-        "@org_golang_google_api//transport:go_default_library",
+        "@io_k8s_klog//:go_default_library",
     ],
 )
 

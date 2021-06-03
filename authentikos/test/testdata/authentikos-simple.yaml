@@ -63,10 +63,10 @@ spec:
       serviceAccountName: authentikos
       containers:
       - name: authentikos
-        image: gcr.io/istio-testing/authentikos:0.0.6
-        imagePullPolicy: Always
+        image: gcr.io/istio-testing/authentikos:latest
+        imagePullPolicy: Never
         args:
-        - --verbose
+        - -v1
         - --creds=/etc/creds/service-account.json
         volumeMounts:
         - name: creds

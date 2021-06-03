@@ -14,12 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package google
 
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -28,30 +29,33 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func makeFile(data string, readable bool) string {
-	f, _ := ioutil.TempFile("", "")
+func makeFile(t *testing.T, data string) string {
+	t.Helper()
+
+	f, err := ioutil.TempFile("", "")
+	if err != nil {
+		t.Fatalf("ioutil.TempFile: %v", err)
+	}
 	fname := f.Name()
 
-	_ = ioutil.WriteFile(fname, []byte(data), 0644)
-
-	if !readable {
-		_ = os.Chmod(fname, 0000)
+	if err := ioutil.WriteFile(fname, []byte(data), 0644); err != nil {
+		t.Fatalf("ioutil.WriteFile: %v", err)
 	}
 
 	return fname
 }
 
 func TestValidateFlags(t *testing.T) {
-	creds := "super secret data"
 	template := "{{.Token}}"
 
-	deletedCredsFile := makeFile(creds, true)
-	validTFile := makeFile(template, true)
-	invalidTFile := makeFile(template, false)
+	validTFile := makeFile(t, template)
+
+	// Simulate invalid/deleted files by generating a path, but has no file.
+	deletedCredsFile := filepath.Join(os.TempDir(), fmt.Sprintf("deleted-creds-%d", time.Now().Unix()))
+	invalidTFile := filepath.Join(os.TempDir(), fmt.Sprintf("invalid-%d", time.Now().Unix()))
 
 	os.Remove(deletedCredsFile)
 	defer os.Remove(validTFile)
-	defer os.Remove(invalidTFile)
 
 	testCases := []struct {
 		name         string
@@ -135,13 +139,17 @@ func TestValidateFlags(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var o options
+
+			o = options{}
 
 			os.Args = []string{"authentikos"}
 			os.Args = append(os.Args, tc.args...)
 			pflag.CommandLine = pflag.NewFlagSet(os.Args[0], pflag.ExitOnError)
+			flags(&o)
+			pflag.Parse()
 
-			o.parseFlags()
+			t.Logf("Options (pre-validate):  %+v", o)
+			t.Cleanup(func() { t.Logf("Options (post-validate): %+v", o) })
 
 			if err := o.validateFlags(); (err != nil) != tc.expectedErr {
 				t.Fatalf("expected error: %t != actual error: %t: %v", tc.expectedErr, err != nil, err)
