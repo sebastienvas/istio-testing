@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,git-exclude:,strict,dry-run,verbose -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,git-exclude:,strict,dry-run,verbose,assignee -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -121,6 +121,10 @@ get_opts() {
       git_exclude="$2"
       shift 2
       ;;
+    --assignee)
+      assignee="$2"
+      shift 2
+      ;;
     --)
       shift
       script_args=("$@")
@@ -198,6 +202,10 @@ validate_opts() {
   if [ -z "${git_exclude:-}" ]; then
     git_exclude=""
   fi
+
+  if [ -z "${assignee:-}" ]; then
+    assignee="@istio/wg-networking-maintainers"
+  fi
 }
 
 evaluate_opts() {
@@ -263,7 +271,7 @@ merge() {
     local issue_exists
     issue_exists=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "istio/istio" | wc -l)
     if [ "$issue_exists" -eq 0 ]; then
-      gh issue create -b "Automatic merge of $merge_branch into $branch failed. @istio/wg-networking-maintainers" -t "Automatic merge of upstream envoy release branch failed" -l "area/networking/envoy" -R "istio/istio"
+      gh issue create -b "Automatic merge of $merge_branch into $branch failed. $assignee" -t "Automatic merge of upstream envoy release branch failed" -l "area/networking/envoy" -R "istio/istio"
       print_error "Conflicts detected, manual merge is required. An issue in istio/istio has been created." 0
     else
       print_error "Conflicts detected, manual merge is required. An issue in istio/istio already exists." 0
